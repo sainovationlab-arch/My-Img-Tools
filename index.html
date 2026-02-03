@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tri-Gen AI Studio | Ultra-HD Flux</title>
+    <meta name="referrer" content="no-referrer">
+    
+    <title>Tri-Gen AI Studio | Ultra-HD Flux (Final)</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-            --glass-bg: rgba(20, 25, 40, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(20, 25, 40, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --bg-dark: #020617;
             --text-main: #f1f5f9;
         }
@@ -19,8 +21,8 @@
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(217, 70, 239, 0.12) 0%, transparent 45%);
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 85%, rgba(217, 70, 239, 0.15) 0%, transparent 50%);
             color: var(--text-main);
             min-height: 100vh;
             padding: 2rem 1rem;
@@ -28,16 +30,14 @@
 
         .container { max-width: 1280px; margin: 0 auto; }
 
-        /* Header */
         header { text-align: center; margin-bottom: 3.5rem; padding-top: 1rem; }
         header h1 {
-            font-size: 3.5rem; font-weight: 800; letter-spacing: -0.03em;
+            font-size: 3rem; font-weight: 800; letter-spacing: -0.03em;
             background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
         }
-        header p { color: #94a3b8; font-size: 1.2rem; }
+        header p { color: #94a3b8; font-size: 1.1rem; }
 
-        /* Input Section */
         .controls {
             background: var(--glass-bg);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -53,14 +53,14 @@
 
         input[type="text"] {
             flex: 1;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 1.2rem 1.5rem;
             color: white; font-size: 1.1rem; outline: none;
             transition: all 0.3s ease;
         }
-        input[type="text"]:focus { border-color: #8b5cf6; background: rgba(255, 255, 255, 0.05); }
+        input[type="text"]:focus { border-color: #8b5cf6; background: rgba(255, 255, 255, 0.08); }
 
         button#generateBtn {
             background: var(--primary-gradient);
@@ -71,26 +71,24 @@
         button#generateBtn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.4); }
         button#generateBtn:disabled { opacity: 0.6; cursor: wait; transform: none; }
 
-        /* Results Grid */
         .results-grid {
             display: grid; grid-template-columns: 1fr; gap: 2rem;
         }
         @media (min-width: 900px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
 
-        /* Image Card */
         .image-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease;
             position: relative;
         }
-        .image-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.4); }
+        .image-card:hover { transform: translateY(-5px); }
 
         .img-wrapper {
             aspect-ratio: 1/1; width: 100%; position: relative;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
             display: flex; align-items: center; justify-content: center;
         }
 
@@ -100,37 +98,33 @@
         }
         .img-wrapper img.loaded { opacity: 1; }
 
-        /* Loading Animation */
         .loader {
             width: 48px; height: 48px;
             border: 4px solid rgba(255,255,255,0.1);
             border-bottom-color: #d946ef;
             border-radius: 50%;
             animation: rotation 1s linear infinite;
-            display: none; /* Hidden by default */
         }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Actions */
-        .card-actions { padding: 1.2rem; display: none; }
+        .card-actions { padding: 1rem; display: none; }
         
         .btn-download {
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
             width: 100%; padding: 0.8rem;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             color: white; text-decoration: none; font-weight: 500;
-            transition: background 0.2s; cursor: pointer;
+            cursor: pointer; transition: background 0.2s;
         }
-        .btn-download:hover { background: rgba(255, 255, 255, 0.15); }
+        .btn-download:hover { background: rgba(255, 255, 255, 0.2); }
 
-        /* Error Message */
         .error-msg {
-            padding: 1.5rem; text-align: center; color: #f87171;
-            display: flex; flex-direction: column; gap: 0.5rem; align-items: center;
+            padding: 1rem; text-align: center; color: #f87171;
+            display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;
         }
-        .error-link { color: #8b5cf6; text-decoration: underline; font-size: 0.9rem; }
+        .error-link { color: #8b5cf6; text-decoration: underline; }
 
         footer { text-align: center; margin-top: 5rem; color: #64748b; font-size: 0.9rem; }
     </style>
@@ -140,24 +134,24 @@
     <div class="container">
         <header>
             <h1>Tri-Gen AI Studio</h1>
-            <p>Generate 3 High-Fidelity Flux Images at Once</p>
+            <p>Flux Model • No Blocking • Ultra HD</p>
         </header>
 
         <section class="controls">
             <div class="input-group">
-                <input type="text" id="promptInput" placeholder="A futuristic city in Gujarat, neon lights, 8k..." autocomplete="off">
-                <button id="generateBtn" onclick="generateImages()">Generate Trio</button>
+                <input type="text" id="promptInput" placeholder="Describe your imagination..." autocomplete="off">
+                <button id="generateBtn" onclick="generateImages()">Generate</button>
             </div>
         </section>
 
         <main id="resultsGrid" class="results-grid">
-            <div class="image-card"><div class="img-wrapper"><span style="color:#64748b">Frame 1</span></div></div>
-            <div class="image-card"><div class="img-wrapper"><span style="color:#64748b">Frame 2</span></div></div>
-            <div class="image-card"><div class="img-wrapper"><span style="color:#64748b">Frame 3</span></div></div>
+            <div class="image-card"><div class="img-wrapper"><span style="color:#64748b">Vision 1</span></div></div>
+            <div class="image-card"><div class="img-wrapper"><span style="color:#64748b">Vision 2</span></div></div>
+            <div class="image-card"><div class="img-wrapper"><span style="color:#64748b">Vision 3</span></div></div>
         </main>
 
         <footer>
-            Powered by Pollinations.ai (Flux Model) • No API Key Required
+            Powered by Pollinations.ai (Flux)
         </footer>
     </div>
 
@@ -166,39 +160,37 @@
         const promptInput = document.getElementById('promptInput');
         const resultsGrid = document.getElementById('resultsGrid');
 
-        // Handle Enter Key
         promptInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') generateImages();
         });
 
         async function generateImages() {
             const prompt = promptInput.value.trim();
-            if (!prompt) return alert("Please write a prompt first!");
+            if (!prompt) return alert("Please enter a prompt!");
 
-            // Update UI
             generateBtn.disabled = true;
-            generateBtn.innerText = "Generating Magic...";
+            generateBtn.innerText = "Generating...";
             resultsGrid.innerHTML = '';
 
-            // Create structure for 3 images
+            // 3 કાર્ડ્સ બનાવો
             for (let i = 0; i < 3; i++) {
                 resultsGrid.innerHTML += `
                     <div class="image-card">
                         <div class="img-wrapper" id="wrapper-${i}">
-                            <div class="loader" id="loader-${i}" style="display:block"></div>
+                            <div class="loader" id="loader-${i}"></div>
                         </div>
                         <div class="card-actions" id="actions-${i}"></div>
                     </div>
                 `;
             }
 
-            // Trigger parallel generation
+            // 3 અલગ અલગ ઈમેજ બનાવો
             const tasks = [0, 1, 2].map(index => fetchAndRenderImage(prompt, index));
             
             await Promise.all(tasks);
             
             generateBtn.disabled = false;
-            generateBtn.innerText = "Generate Trio";
+            generateBtn.innerText = "Generate";
         }
 
         async function fetchAndRenderImage(prompt, index) {
@@ -206,30 +198,34 @@
             const loader = document.getElementById(`loader-${index}`);
             const actions = document.getElementById(`actions-${index}`);
             
-            // Random Seed for variety
-            const seed = Math.floor(Math.random() * 1000000);
-            // URL with FLUX model
+            // રેન્ડમ સીડ જેથી ફોટા અલગ આવે
+            const seed = Math.floor(Math.random() * 2000000);
+            
+            // Pollinations URL
             const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=1024&height=1024&nologo=true&model=flux`;
 
             return new Promise((resolve) => {
                 const img = new Image();
-                img.crossOrigin = "anonymous"; // Important for downloads
+                
+                // ક્રોસ-ઓરિજિન કાઢી નાખ્યું છે જેથી બ્લોક ન થાય, ડાઉનલોડ માટે આપણે બીજી રીત વાપરીશું
+                // img.crossOrigin = "anonymous"; 
+
                 img.src = imageUrl;
 
                 img.onload = () => {
                     loader.style.display = 'none';
                     img.style.display = 'block';
                     img.classList.add('loaded');
-                    wrapper.innerHTML = ''; // Clear loader
+                    wrapper.innerHTML = ''; 
                     wrapper.appendChild(img);
 
-                    // Add Download Button
                     actions.style.display = 'block';
+                    // ડાયરેક્ટ લિંક ડાઉનલોડ (સૌથી સુરક્ષિત રીત)
                     actions.innerHTML = `
-                        <button class="btn-download" onclick="downloadImage('${imageUrl}', 'flux-gen-${seed}.jpg')">
+                        <a href="${imageUrl}" target="_blank" class="btn-download" download="ai-image-${seed}.jpg">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            Download
-                        </button>
+                            Download / Open
+                        </a>
                     `;
                     resolve();
                 };
@@ -238,29 +234,13 @@
                     loader.style.display = 'none';
                     wrapper.innerHTML = `
                         <div class="error-msg">
-                            <span>⚠️ Failed to Load</span>
-                            <a href="${imageUrl}" target="_blank" class="error-link">Check Direct Link</a>
-                            <small style="color:#64748b; font-size:0.7rem;">(AdBlocker might be blocking)</small>
+                            <span>❌ Failed to Load</span>
+                            <a href="${imageUrl}" target="_blank" class="error-link">Click to View Image</a>
                         </div>
                     `;
                     resolve();
                 };
             });
-        }
-
-        async function downloadImage(url, filename) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (error) {
-                alert("Download failed. Please right-click the image and save.");
-            }
         }
     </script>
 </body>
