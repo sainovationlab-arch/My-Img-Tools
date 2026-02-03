@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tri-Gen AI Studio | Ultra-HD Image Generator</title>
+    <!-- Google Fonts: Inter for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --bg-dark: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Header Section --- */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-weight: 800;
+            font-size: 3rem;
+            letter-spacing: -0.05em;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        /* --- Input Section (Glassmorphism) --- */
+        .controls {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+        }
+
+        @media (min-width: 640px) {
+            .input-group { flex-direction: row; }
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #6366f1;
+        }
+
+        button {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- Results Grid --- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .results-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* --- Image Cards & Skeleton --- */
+        .image-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .image-card:hover {
+            transform: scale(1.02);
+        }
+
+        .img-container {
+            aspect-ratio: 1/1;
+            width: 100%;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* Hidden until loaded */
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .skeleton::after {
+            content: "Generating...";
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .card-actions {
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid var(--glass-border);
+            width: 100%;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Tri-Gen AI Studio</h1>
+            <p>One prompt. Three distinct artistic visions.</p>
+        </header>
+
+        <section class="controls">
+            <div class="input-group">
+                <input type="text" id="promptInput" placeholder="Describe something magnificent..." autocomplete="off">
+                <button id="generateBtn">Generate Trio</button>
+            </div>
+        </section>
+
+        <main id="resultsGrid" class="results-grid">
+            <!-- Initial Empty State / Placeholders -->
+            <div class="image-card">
+                <div class="img-container">
+                    <div class="skeleton" style="display: none;"></div>
+                    <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #475569; padding: 20px; text-align: center;">
+                        AI Output 1
+                    </div>
+                </div>
+            </div>
+            <div class="image-card">
+                <div class="img-container">
+                    <div class="skeleton" style="display: none;"></div>
+                    <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #475569; padding: 20px; text-align: center;">
+                        AI Output 2
+                    </div>
+                </div>
+            </div>
+            <div class="image-card">
+                <div class="img-container">
+                    <div class="skeleton" style="display: none;"></div>
+                    <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #475569; padding: 20px; text-align: center;">
+                        AI Output 3
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            Powered by Pollinations.ai • High Quality 1024x1024 Generation
+        </footer>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generateBtn');
+        const promptInput = document.getElementById('promptInput');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        /**
+         * Triple Generation Logic:
+         * 1. Capture user prompt.
+         * 2. Create 3 distinct versions by appending unique random seeds.
+         * 3. Use Promise.all() to trigger all three image loads simultaneously.
+         */
+        async function handleGeneration() {
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt) {
+                alert("Please enter a prompt first!");
+                return;
+            }
+
+            // UI State updates
+            generateBtn.disabled = true;
+            generateBtn.innerText = "Creating Magic...";
+            resultsGrid.innerHTML = ''; // Clear previous results
+
+            // Create 3 slots with skeletons
+            for (let i = 0; i < 3; i++) {
+                resultsGrid.innerHTML += `
+                    <div class="image-card">
+                        <div class="img-container" id="container-${i}">
+                            <div class="skeleton"></div>
+                        </div>
+                        <div class="card-actions" id="actions-${i}" style="display:none;"></div>
+                    </div>
+                `;
+            }
+
+            // Generate 3 unique promises
+            const generationTasks = [0, 1, 2].map(index => generateSingleImage(userPrompt, index));
+
+            try {
+                await Promise.all(generationTasks);
+            } catch (error) {
+                console.error("Generation failed", error);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerText = "Generate Trio";
+            }
+        }
+
+        async function generateSingleImage(prompt, index) {
+            // Logic for Variety: Append a large random seed to ensure uniqueness
+            const randomSeed = Math.floor(Math.random() * 9999999);
+            const encodedPrompt = encodeURIComponent(prompt);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${randomSeed}&width=1024&height=1024&nologo=true`;
+
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = imageUrl;
+                
+                img.onload = () => {
+                    const container = document.getElementById(`container-${index}`);
+                    const actions = document.getElementById(`actions-${index}`);
+                    
+                    // Hide skeleton and show image
+                    container.innerHTML = ''; 
+                    img.style.display = 'block';
+                    container.appendChild(img);
+                    
+                    // Add Download Button logic
+                    actions.style.display = 'block';
+                    actions.innerHTML = `
+                        <button class="download-btn" onclick="downloadImage('${imageUrl}', 'tri-gen-ai-${index}.jpg')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Download HQ
+                        </button>
+                    `;
+                    resolve();
+                };
+
+                img.onerror = () => {
+                    const container = document.getElementById(`container-${index}`);
+                    container.innerHTML = '<div style="padding: 20px; text-align: center; color: #ef4444;">Failed to load image.</div>';
+                    reject();
+                };
+            });
+        }
+
+        /**
+         * Forcing Browser Download:
+         * To prevent images from just opening in a new tab, we fetch the 
+         * image as a blob and create a temporary local object URL.
+         */
+        async function downloadImage(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (err) {
+                alert("Download failed. You can right-click the image and 'Save As'.");
+            }
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', handleGeneration);
+        promptInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleGeneration();
+        });
+    </script>
+</body>
+</html>
